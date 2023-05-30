@@ -1,25 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    
+    const getFactsApi = async() => {
+        await fetch('https://catfact.ninja/fact').then((res) => res.json()).then((data) =>( 
+            setFacts(data.fact),
+            getGiphyApi(data.fact?.split(" ",3).join(' '))
+        ))
+    } 
+    
+    const getGiphyApi = async(phrase) => {
+        await fetch(`https://api.giphy.com/v1/gifs/search?api_key=OjmWyQ83ebCgPKBS36I3df4LFc9z8Wqr&q=${phrase}`).then((resp) => resp.json()).then((data) => setGiphy(data.data[0].images.original.url));
+    }
+
+    useEffect(() => {
+        getFactsApi()
+    },[]);
+    
+    const [facts, setFacts] = useState();
+    const [giphy, setGiphy] = useState();
+
+    return(
+        <div style={{ display: "flex" , gap: '20px', alignItems: "center" }}>
+            <h1>{facts}</h1>
+            <img src={giphy} style={{ width: "200px", height: "200px", objectFit: "contain" }}></img>
+            
+        </div>
+    )
 }
+
 
 export default App;
